@@ -7,19 +7,24 @@ local socket = GWSockets.createWebSocket("ws://localhost:27010")
 
 util.AddNetworkString("DiscordMessage")
 
-function HexColor(hex, alpha)
+local function HexColor(hex, alpha)
     hex = hex:gsub("#","")
     return Color(tonumber("0x" .. hex:sub(1,2)), tonumber("0x" .. hex:sub(3,4)), tonumber("0x" .. hex:sub(5,6)), alpha or 255)
 end
 
+local function SendMessage(name, text)
+    print(name .. ": " .. text)
+    socket:write(util.TableToJSON({name = name, text = text}))
+end
+
 function socket:onMessage(text)
     local success, err = pcall(function()
-        local name, color, text = string.match(text, "name:(.+)\ncolor:(.+)\ntext:(.+)")
-        if name and color and text then
+        local data = util.JSONToTable(text)
+        if data and data.name and data.color and data.text then
             net.Start("DiscordMessage")
-                net.WriteString(name)
-                net.WriteColor(HexColor(color))
-                net.WriteString(text)
+                net.WriteString(data.name)
+                net.WriteColor(HexColor(data.color))
+                net.WriteString(data.text)
             net.Broadcast()
         end
     end)
@@ -42,24 +47,24 @@ function socket:onDisconnected()
 end
 
 hook.Add("PlayerSay", "GMRelayChat", function(plr, text)
-    socket:write("-name:" .. plr:GetName() .. "-text:" .. text)
+    SendMessage(plr:GetName(), text)
 end)
 
 hook.Add("PlayerInitialSpawn", "GMRelayJoin", function(plr)
-    socket:write("-name:Server-text:**" .. plr:GetName() .. "** has joined the server.")
+    SendMessage("Server", "**" .. plr:GetName() .. "** has joined the server.")
 end)
 
 hook.Add("PlayerDisconnected", "GMRelayLeave", function(plr)
-    socket:write("-name:Server-text:**" .. plr:GetName() .. "** has left the server.")
+    SendMessage("Server", "**" .. plr:GetName() .. "** has left the server.")
 end)
 
 hook.Add("PlayerDeath", "GMRelayDied", function(victim, inflictor, attacker)
     if victim == attacker then
-        socket:write("-name:Server-text:**" .. victim:GetName() .. "** committed suicide.")
+        SendMessage("Server", "**" .. victim:GetName() .. "** committed suicide.")
     elseif attacker:IsPlayer() then
-        socket:write("-name:Server-text:**" .. victim:GetName() .. "** was killed by **".. attacker:Nick() .."** using **".. inflictor:GetClass() ..".")
+        SendMessage("Server", "**" .. victim:GetName() .. "** was killed by **".. attacker:Nick() .."** using **".. inflictor:GetClass() ..".")
     else
-        socket:write("-name:Server-text:**" .. victim:GetName() .. "** was killed by **".. attacker:GetClass() .."**.")
+        SendMessage("Server", "**" .. victim:GetName() .. "** was killed by **".. attacker:GetClass() .."**.")
     end
 end)
 

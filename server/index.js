@@ -19,7 +19,6 @@ if (fs.existsSync('config.json')) {
 // Create server and websocket, bind to events
 
 let server = http.createServer(function(request, response) {
-    console.log("received request");
     response.writeHead(404);
     response.end();
 });
@@ -37,20 +36,23 @@ websocket.on("request", function(request){
     console.log("connected");
 
     connection.on('message', function(message){
-        let content = message.utf8Data.match(new RegExp("\-name:(?<name>.*)\-text:(?<text>.*)"))
-        if (content){
-            console.log(content.groups['name']);
-            console.log(content.groups['text']);
+        let data = JSON.parse(message.utf8Data);
+        if (data){
             client.webhook.send({
-                content: content.groups['text'],
-                username: content.groups['name']
+                content: data.text,
+                username: data.name
             })
         }
     });
 
     client.on('messageCreate', (message) => {
         if (message.channel.id == config.channelId && !message.author.bot){
-            let response = "name:" + message.member.displayName + "\ncolor:" + message.member.displayHexColor + "\ntext:" + message.content;
+            let data = {
+                "name": message.member.displayName,
+                "color": message.member.displayHexColor,
+                "text": message.content
+            }
+            let response = JSON.stringify(data);
             connection.send(response);
             console.log(response);
         }
