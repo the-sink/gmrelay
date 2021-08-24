@@ -1,5 +1,11 @@
-# gmrelay
-A Discord &lt;-> Garry's Mod chat relay server
+<img src="resources/logo.png" align="right" height="84" />
+
+# gmrelay [![License](https://img.shields.io/github/license/the-sink/gmrelay)](https://github.com/the-sink/gmrelay/blob/main/LICENSE) [![discord.js](https://img.shields.io/badge/discord.js-v13.1.0-blue.svg?logo=npm)](https://www.npmjs.com/package/discord.js) [![Issues](https://img.shields.io/github/issues/the-sink/gmrelay)](https://github.com/the-sink/gmrelay/issues)
+
+A Discord &lt;-> Garry's Mod chat relay server. This relay system communicates between the GMod server and a node.js server (also serving as the discord bot) over a websocket.
+
+
+Unlike other systems, this one runs a dedicated relay server (as opposed to something like a php script hosted using nginx that pipe messages in and out). This sacrifices some convenience, requiring you to run a server in the background, but makes it way more extensible and nice to work with in my opinion.
 
 ## Requirements
 
