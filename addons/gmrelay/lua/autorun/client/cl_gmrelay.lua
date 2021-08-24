@@ -6,7 +6,7 @@ local function discordMessageReceived(length, player)
     local color = net.ReadColor()
     local text = net.ReadString()
 
-    chat.AddText(color, name, ": ", Color(255, 255, 255), text)
+    chat.AddText("[Discord] ", color, name, ": ", Color(255, 255, 255), text)
 end
 
 net.Receive("DiscordMessage", discordMessageReceived)
