@@ -1,12 +1,12 @@
 const fs = require('fs');
 const http = require('http');
-var WebSocketServer = require('websocket').server;
 const Discord = require('discord.js');
 
 // Prepare Discord client and pull config file
 
 const client = new Discord.Client({intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES]});
 
+let WebSocketServer = require('websocket').server;
 let config = {};
 
 if (fs.existsSync('config.json')) {
@@ -32,10 +32,10 @@ let websocket = new WebSocketServer({
 });
 
 websocket.on("request", function(request){
-    var connection = request.accept(null, request.origin);
+    let connection = request.accept(null, request.origin);
     console.log("connected");
 
-    var messageListener = (message) => {
+    let messageListener = (message) => {
         if (message.channel.id == config.channelId && !message.author.bot){
             let data = {
                 "name": message.member.displayName,
