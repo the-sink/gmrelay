@@ -1,7 +1,13 @@
 # gmrelay
 A Discord &lt;-> Garry's Mod chat relay server
 
-Uses [GWSockets](https://github.com/FredyH/GWSockets) and the [websocket](https://www.npmjs.com/package/websocket) package.
+## Requirements
+
+Node.js version: `>=16.6.0`
+
+Uses [GWSockets](https://github.com/FredyH/GWSockets) on the GMod side. Download the neccesary dll and place it in `lua/bin`.
+
+Node.js relay server uses [discord.js](https://www.npmjs.com/package/discord.js) and [websocket](https://www.npmjs.com/package/websocket), which should be installed automatically when `npm install` is executed in the proper folder.
 
 ## Warning
 
