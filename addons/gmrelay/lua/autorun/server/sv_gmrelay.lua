@@ -41,12 +41,6 @@ function socket:onDisconnected()
     print("disconnected from websocket")
 end
 
-timer.Create("GMRelaySocketConnector", 5, 0, function()
-    if not socket:isConnected() then
-        socket:open()
-    end
-end)
-
 hook.Add("PlayerSay", "GMRelayChat", function(plr, text)
     socket:write("-name:" .. plr:GetName() .. "-text:" .. text)
 end)
@@ -59,10 +53,22 @@ hook.Add("PlayerDisconnected", "GMRelayLeave", function(plr)
     socket:write("-name:Server-text:**" .. plr:GetName() .. "** has left the server.")
 end)
 
-hook.Add("PlayerDeath", "GMRelayDied", function(victim, _inflictor, attacker)
+hook.Add("PlayerDeath", "GMRelayDied", function(victim, inflictor, attacker)
     if victim == attacker then
         socket:write("-name:Server-text:**" .. victim:GetName() .. "** committed suicide.")
+    elseif attacker:IsPlayer() then
+        socket:write("-name:Server-text:**" .. victim:GetName() .. "** was killed by **".. attacker:Nick() .."** using **".. inflictor:GetClass() ..".")
     else
-        socket:write("-name:Server-text:**" .. victim:GetName() .. "** was killed by **".. attacker:GetName() .."**!")
+        socket:write("-name:Server-text:**" .. victim:GetName() .. "** was killed by **".. attacker:GetClass() .."**.")
     end
 end)
+
+socket:open()
+
+timer.Create("GMRelaySocketConnector", 5, 0, function()
+    print(socket:isConnected())
+    if not socket:isConnected() then
+        socket:open()
+    end
+end)
+timer.Start("GMRelaySocketConnector")
