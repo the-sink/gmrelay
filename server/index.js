@@ -35,17 +35,7 @@ websocket.on("request", function(request){
     var connection = request.accept(null, request.origin);
     console.log("connected");
 
-    connection.on('message', function(message){
-        let data = JSON.parse(message.utf8Data);
-        if (data){
-            client.webhook.send({
-                content: data.text,
-                username: data.name
-            })
-        }
-    });
-
-    client.on('messageCreate', (message) => {
+    var messageListener = (message) => {
         if (message.channel.id == config.channelId && !message.author.bot){
             let data = {
                 "name": message.member.displayName,
@@ -56,7 +46,28 @@ websocket.on("request", function(request){
             connection.send(response);
             console.log(response);
         }
+    };
+
+    connection.on('message', function(message){
+        let data = JSON.parse(message.utf8Data);
+        if (data){
+            client.webhook.send({
+                content: data.text,
+                username: data.name
+            })
+        }
     });
+
+    connection.on('error', function(err){
+        console.warn("A websocket error has occured: " + err);
+    });
+
+    connection.on('close', function(){
+        console.log("disconnected");
+        client.removeListener('messageCreate', messageListener);
+    });
+
+    client.on('messageCreate', messageListener);
 });
 
 client.on('ready', () => {
