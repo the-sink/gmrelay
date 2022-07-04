@@ -71,7 +71,6 @@ end)
 socket:open()
 
 timer.Create("GMRelaySocketConnector", 5, 0, function()
-    print(socket:isConnected())
     if not socket:isConnected() then
         socket:open()
     end
